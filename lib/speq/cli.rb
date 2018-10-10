@@ -1,13 +1,15 @@
 require 'find'
+require 'colorize'
+require 'spec/test'
 
 # Provides a CLI for running Speq
 module Speq
   class CLI
-    attr_accessor :groups
+    attr_accessor :tests
 
     def initialize(cli_args)
       @files = find_files(cli_args)
-      @groups = []
+      @tests = []
     end
 
     def find_files(file_prefixes)
@@ -16,12 +18,14 @@ module Speq
       Dir.glob("#{Dir.pwd}/**/{#{file_prefixes.join(',')}}_speq.rb")
     end
 
-    def does(*args, **kw_args, &block)
-      groups << [args, kw_args, block]
+    def does(subject, &block)
+      tests << Test.new(subject, self, &block)
     end
 
     def run
-      @files.each { |file| instance_eval(File.read(file)) }
+      @files.each { |file| instance_eval(File.read(file), file) }
+      @tests.each(&:report)
+      @tests.all?(&:passed?)
     end
   end
 end

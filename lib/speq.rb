@@ -7,7 +7,7 @@ require 'speq/cli'
 module Speq
   module_function
 
-  def does(*args, **kw_args, &block)
-    [args, kw_args, block]
+  def does(subject, &block)
+    Test.new(subject, self, &block).report
   end
 end

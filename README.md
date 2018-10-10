@@ -1,8 +1,8 @@
 # Speq
 
-## A tiny library to build specs with fewer words.
+## A tiny library to build specs with fewer words
 
-Speq aims to work well for rapid prototyping, learning, and anytime that writing specs would otherwise feel excessive.
+Speq is TDD library for rapid prototyping in Ruby. It aims to work well anytime testing is desired but writing specs with existing tools may feel excessive.
 
 Speq favors simplicity and minimalism, which may not always be compatible with rigorous testing. The existing TDD tools for Ruby are exceptional, and Speq is not a replacement.
 
@@ -22,9 +22,36 @@ Or install it yourself as:
 
     $ gem install speq
 
+## Syntax
+
+Speq excels at running many similar tests and checks. It omits explicit descriptions and outputs simple reports.
+
+```ruby
+does :prime? do
+  given 0, 1, 8, match: false
+  given 2, 3, 97, match: true
+end
+```
+
 ## Usage
 
-### CLI
+### Wherever you want
+
+```ruby
+require 'speq'
+
+class Array
+  def my_map
+    Array.new(length) { |index| yield(self[index])}
+  end
+end
+
+# Spec.test...
+```
+
+### With dedicated spec files
+
+Speq also offers a simple CLI that lets you run tests written in dedicated spec files.
 
 Executing the following command:
 
@@ -37,17 +64,6 @@ To run individual files, specify a list of speq file prefixes. For example, to r
     $ bundle exec speq example sample
 
 Speq files are not expected to require `speq`, but they should require other files that may be needed to run the speqs.
-
-### A simple test
-
-Speq excels at running many similar tests and checks. It omits explicit descriptions and outputs simple reports.
-
-```ruby
-does :prime? do
-  given 0, 1, 8, match: false
-  given 2, 3, 97, match: true
-end
-```
 
 ## Contributing
 
