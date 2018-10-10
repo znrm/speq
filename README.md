@@ -46,7 +46,7 @@ class Array
   end
 end
 
-# Spec.test...
+# Speq.test...
 ```
 
 ### With dedicated spec files

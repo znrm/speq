@@ -1,6 +1,6 @@
 require 'find'
 require 'colorize'
-require 'spec/test'
+require 'speq/test'
 
 # Provides a CLI for running Speq
 module Speq
