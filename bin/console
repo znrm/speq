@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'speq'
-
 require 'pry'
+
+require 'speq'
+include Speq
+
 Pry.start

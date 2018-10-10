@@ -24,9 +24,23 @@ Or install it yourself as:
 
 ## Usage
 
-Speq excels at running many similar tests and checks. It omits explicit descriptions and outputs simple reports.
+### CLI
+
+Executing the following command:
+
+    $ bundle exec speq
+
+will recursively search the working directory and run all files that end with `_speq.rb`.
+
+To run individual files, specify a list of speq file prefixes. For example, to run tests that are within the files `example_speq.rb` and `sample_speq.rb`, simply execute:
+
+    $ bundle exec speq example sample
+
+Speq files are not expected to require `speq`, but they should require other files that may be needed to run the speqs.
 
 ### A simple test
+
+Speq excels at running many similar tests and checks. It omits explicit descriptions and outputs simple reports.
 
 ```ruby
 does :prime? do
