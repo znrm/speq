@@ -16,22 +16,21 @@ gem 'speq'
 
 And then execute:
 
-    $ bundle
+    bundle
 
 Or install it yourself as:
 
-    $ gem install speq
+    gem install speq
+
+## Design
+
+Speq's design choices are influenced by the competing motivations of having tests be as short and simple as possible while maintaining the flexibility to be as descriptive as needed.
+
+### Testing pattern
+
+Speq is loosely based on the given-when-then or arrange-act-assert testing pattern. Whereas one would typically need to make each step explicit, Speq tests focus on making it
 
 ## Syntax
-
-Speq excels at running many similar tests and checks. It omits explicit descriptions and outputs simple reports.
-
-```ruby
-does :prime? do
-  given 0, 1, 8, match: false
-  given 2, 3, 97, match: true
-end
-```
 
 ## Usage
 
@@ -40,30 +39,24 @@ end
 ```ruby
 require 'speq'
 
-class Array
-  def my_map
-    Array.new(length) { |index| yield(self[index])}
-  end
+Speq.test do
+  # Tests here can access local variables.
+  # Test results are printed to $stdout.
+  # The method returns true if all tests pass, false otherwise.
 end
-
-# Speq.test...
 ```
 
 ### With dedicated spec files
 
 Speq also offers a simple CLI that lets you run tests written in dedicated spec files.
 
-Executing the following command:
-
-    $ bundle exec speq
-
-will recursively search the working directory and run all files that end with `_speq.rb`.
+Executing `bundle exec speq` will recursively search the working directory and run all files that end with `_speq.rb`.
 
 To run individual files, specify a list of speq file prefixes. For example, to run tests that are within the files `example_speq.rb` and `sample_speq.rb`, simply execute:
 
-    $ bundle exec speq example sample
+    bundle exec speq example sample
 
-Speq files are not expected to require `speq`, but they should require other files that may be needed to run the speqs.
+Speq files are not expected to require `speq`, but they should require other files that may be needed to run the specs.
 
 ## Contributing
 
