@@ -28,7 +28,7 @@ Speq's design choices are influenced by the competing motivations of having test
 
 ### Testing pattern
 
-Speq is loosely based on the given-when-then or arrange-act-assert testing pattern. Whereas one would typically need to make each step explicit, Speq tests focus on making it
+Speq is loosely based on the given-when-then or arrange-act-assert testing pattern. Whereas one would typically need to make each step explicit, Speq tests focus on making it easy to simply assert the expected behavior with the arrangement and action made implicit.
 
 ## Syntax
 
