@@ -18,10 +18,6 @@ module Speq
       Dir.glob("#{Dir.pwd}/**/{#{file_prefixes.join(',')}}_speq.rb")
     end
 
-    def does(subject, &block)
-      tests << Test.new(subject, self, &block)
-    end
-
     def run
       @files.each { |file| instance_eval(File.read(file), file) }
       @tests.each(&:report)
