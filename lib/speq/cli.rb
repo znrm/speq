@@ -1,6 +1,5 @@
 require 'find'
 require 'colorize'
-require 'speq/test'
 
 # Provides a CLI for running Speq
 module Speq
@@ -19,7 +18,7 @@ module Speq
     end
 
     def run
-      @files.each { |file| instance_eval(File.read(file), file) }
+      @files.each { |file| Speq.module_eval(File.read(file), file) }
       @tests.each(&:report)
       @tests.all?(&:passed?)
     end

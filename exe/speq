@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 
-require 'speq/cli'
+require 'speq'
 Speq::CLI.new(ARGV).run
