@@ -30,6 +30,12 @@ Speq is loosely based on the given-when-then or arrange-act-assert testing patte
 
 ## Syntax
 
+Speq's syntax is still in flux and likely to change dramatically until an effective setup is established.
+
+```ruby
+test_unit :sort, on: [3, 2, 1], eq: [1, 2, 3]
+```
+
 ## Usage
 
 ### Wherever you want

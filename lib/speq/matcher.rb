@@ -26,7 +26,7 @@ module Speq
       Matcher.new(->(actual_object) { expected_object.equal?(actual_object) })
     end
 
-    def self.raise(expected_except)
+    def self.raises(expected_except)
       case expected_except
       when Class
         raise_class(expected_except)
