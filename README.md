@@ -28,12 +28,67 @@ Speq's design choices are influenced by the competing motivations of having test
 
 Speq is loosely based on the given-when-then or arrange-act-assert testing pattern. Whereas one would typically need to make each step explicit, Speq tests focus on making it easy to simply assert the expected behavior with an implicit arrangement and action.
 
+### Actions
+
+```ruby
+
+```
+`call`:
+`on`  :
+`with`:
+
 ## Syntax
 
 Speq's syntax is still in flux and likely to change dramatically until an effective setup is established.
 
 ```ruby
-test_unit :sort, on: [3, 2, 1], eq: [1, 2, 3]
+# Testing return values
+
+## Simple one-line tests
+does :sort, on: [3, 2, 1], eq: [1, 2, 3]
+
+## Multi-line tests
+does :new, on: Array, 3, proc {| index | index * index }
+
+# Testing side-effects
+
+# Example for testing an entire class
+does Array do
+  let(:empty) { [] }
+  let(:unsorted) { [3, 4, 2, 0, 1] }
+  let(:random) { Array.new(10) { rand } }
+
+  does :is_a do
+    given Module
+  end
+
+end
+```
+
+### Matchers
+
+Built in matchers
+
+```ruby
+# Expected
+eq(value)
+is(object)
+raises('The following error message')
+raises(ErrorClass)
+truthy()
+falsey()
+```
+
+### Fakes
+
+Fakes are Speq's simple implementation of a test double. Most closely resembling a stub, fakes provide canned or computed responses, allowing for additional test isolation for objects that rely on objects not within the scope of testing.
+
+```ruby
+fake_bank = fake(
+  balance: 5000,
+  print_balance: '$50.00',
+  withdraw: proc {|amount| [50, amount].min }
+)
 ```
 
 ## Usage
