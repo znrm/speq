@@ -22,38 +22,68 @@ Or install it yourself as:
 
     gem install speq
 
-## Design
+## Design & Syntax
 
-Speq's design choices are influenced by the competing motivations of having tests be as short and simple as possible while maintaining the flexibility to be as descriptive as needed.
+_Speq's syntax and report format is still in flux and likely to change dramatically until an effective setup is established._
 
-Speq is loosely based on the given-when-then or arrange-act-assert testing pattern. Whereas one would typically need to make each step explicit, Speq tests focus on making it easy to simply assert the expected behavior with an implicit arrangement and action.
+Speq is loosely based on the given-when-then or arrange-act-assert testing pattern. Speq's design choices are guided by the competing motivations of having tests be as short and simple as possible while maintaining the flexibility to be as descriptive as needed.
+
+A speq should ask the question or indicate whatan action should do.
+The simplest way to achieve this is to describe the behavior followed by a code block that returns true or false.
+
+This can be achieved with the method `speq`, the simplest construct in Speq.
+
+```ruby
+speq '2 is prime' { prime?(2) }
+```
 
 ### Actions
+
+The above works decently, but it's not much better than existing solutions. Furthermore, the description should have easily been inferred from the action.
+
+To automatically generate descriptions of the action taken, we need to only be a bit more explicit about the action.
+
+Specifically, we can be explicit about the method, arguments being passed, and receiver using the methods `does`, `with`, and `on`, respectively.
+
+```ruby
+does(:to_s).eq('main')
+
+on([3,2,1]).does(:sort).
+```
+
+Doing so also has the distinct advantage of making it easy to run many similar tests on the same subject.
+
+#### Multiple testing pattern
 
 ```ruby
 
 ```
-`call`:
-`on`  :
-`with`:
 
-## Syntax
-
-Speq's syntax is still in flux and likely to change dramatically until an effective setup is established.
+#### `does`
 
 ```ruby
-# Testing return values
+on([3,2,1]).does(:sort).eq()
+```
 
-## Simple one-line tests
-does :sort, on: [3, 2, 1], eq: [1, 2, 3]
+#### `with`
 
-## Multi-line tests
-does :new, on: Array, 3, proc {| index | index * index }
+#### `on`
 
-# Testing side-effects
+```ruby
 
+# 1 / 1 test passed
+
+# Does calling prime? with the argument 2 return true?
+
+```
+
+`call`:
+`on` : Object
+`with`:
+
+```ruby
 # Example for testing an entire class
-does Array do
+speq Array do
   let(:empty) { [] }
   let(:unsorted) { [3, 4, 2, 0, 1] }
   let(:random) { Array.new(10) { rand } }
