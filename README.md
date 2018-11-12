@@ -28,10 +28,7 @@ _Speq's syntax and report format is still in flux and likely to change dramatica
 
 Speq is loosely based on the given-when-then or arrange-act-assert testing pattern. Speq's design choices are guided by the competing motivations of having tests be as short and simple as possible while maintaining the flexibility to be as descriptive as needed.
 
-A speq should ask the question or indicate whatan action should do.
-The simplest way to achieve this is to describe the behavior followed by a code block that returns true or false.
-
-This can be achieved with the method `speq`, the simplest construct in Speq.
+In contrast to similar tools, speqs are typically framed as _questions_ about a program's behavior rather than _descriptions_ of what it does. If descriptions are preferred, this can still be achieved with the method `speq`, which accepts a string and a code block that should evaluate to true or false.
 
 ```ruby
 speq '2 is prime' { prime?(2) }
@@ -39,77 +36,30 @@ speq '2 is prime' { prime?(2) }
 
 ### Actions
 
-The above works decently, but it's not much better than existing solutions. Furthermore, the description should have easily been inferred from the action.
-
-To automatically generate descriptions of the action taken, we need to only be a bit more explicit about the action.
-
-Specifically, we can be explicit about the method, arguments being passed, and receiver using the methods `does`, `with`, and `on`, respectively.
+The above works, but it's not much better than existing solutions. Furthermore, the description should have easily been inferred from the action. To automatically generate descriptions of the action taken, we need only be a bit more explicit about the action:
 
 ```ruby
-does(:to_s).eq('main')
+is(:prime?).of(2).true?
 
-on([3,2,1]).does(:sort).
+on([3,2,1]).does(:sort).eq?([1, 2, 3])
 ```
 
-Doing so also has the distinct advantage of making it easy to run many similar tests on the same subject.
+More specifically, we can be explicit about the method/message, the arguments being passed, and the receiver by using the following methods:
 
-#### Multiple testing pattern
+- message/method: `does(:message)` or `is(:message)`
+- arguments (optional): `with(args)` or `of(args)`
+- receiver (optional, default: Object): `on`
 
-```ruby
+#### Ending an Action
 
-```
+Actions begin when any of the methods above are invoked and are evaluated
+A
 
-#### `does`
+See [Matchers](#matchers) for a details of built-in matchers.
 
-```ruby
-on([3,2,1]).does(:sort).eq()
-```
+### Additional Functionality
 
-#### `with`
-
-#### `on`
-
-```ruby
-
-# 1 / 1 test passed
-
-# Does calling prime? with the argument 2 return true?
-
-```
-
-`call`:
-`on` : Object
-`with`:
-
-```ruby
-# Example for testing an entire class
-speq Array do
-  let(:empty) { [] }
-  let(:unsorted) { [3, 4, 2, 0, 1] }
-  let(:random) { Array.new(10) { rand } }
-
-  does :is_a do
-    given Module
-  end
-
-end
-```
-
-### Matchers
-
-Built in matchers
-
-```ruby
-# Expected
-eq(value)
-is(object)
-raises('The following error message')
-raises(ErrorClass)
-truthy()
-falsey()
-```
-
-### Fakes
+#### Fakes
 
 Fakes are Speq's simple implementation of a test double. Most closely resembling a stub, fakes provide canned or computed responses, allowing for additional test isolation for objects that rely on objects not within the scope of testing.
 
@@ -119,6 +69,56 @@ fake_bank = fake(
   print_balance: '$50.00',
   withdraw: proc {|amount| [50, amount].min }
 )
+```
+
+#### Consistent State
+
+```ruby
+let(:empty) { [] }
+let(:unsorted) { [3, 4, 2, 0, 1] }
+let(:random) { Array.new(10) { rand } }
+```
+
+#### Action Chains
+
+Typically, if may be sufficient to set up the program state
+
+Occasionally, we may want to describe an entire series of actions.
+
+#### Multiple testing pattern
+
+Speq has the distinct advantage of making it particularly easy to run many similar tests on the same subject.
+
+### Matchers
+
+### Examples
+
+```ruby
+does(:prime?).with(-1).raise?('Prime is not defined for negative numbers')
+
+on(User).does(:new).with(id: 1, name: 'user name').private?(:id)
+```
+
+Built in matchers allow for
+
+Matchers can be combined with the usual boolean operators: `not`, `and`, & `or`
+
+```ruby
+eq?(obj)      # result == obj
+eql?(obj)     # result.eql?(obj)
+case_of?(obj) # result === obj
+same_as?(obj) # result.equal?(obj)
+
+true?
+false?
+truthy?
+falsey?
+
+raise?('The following error message')
+raise?(ErrorClass)
+
+instance_of?(SomeClass)
+private?(:message)
 ```
 
 ## Usage
