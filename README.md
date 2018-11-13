@@ -4,7 +4,7 @@
 
 Speq is TDD library for rapid prototyping in Ruby. It aims to work well anytime testing is desired but writing specs with existing tools may feel excessive.
 
-Speq favors simplicity and minimalism, which may not always be compatible with rigorous testing. The existing TDD tools for Ruby are exceptional, and Speq is not a replacement.
+Speq favors simplicity and minimalism, which may not always be compatible with rigorous testing. The existing TDD tools for Ruby are exceptional, and Speq is not meant to be a replacement.
 
 ## Installation
 
@@ -28,32 +28,53 @@ _Speq's syntax and report format is still in flux and likely to change dramatica
 
 Speq is loosely based on the given-when-then or arrange-act-assert testing pattern. Speq's design choices are guided by the competing motivations of having tests be as short and simple as possible while maintaining the flexibility to be as descriptive as needed.
 
-In contrast to similar tools, speqs are typically framed as _questions_ about a program's behavior rather than _descriptions_ of what it does. If descriptions are preferred, this can still be achieved with the method `speq`, which accepts a string and a code block that should evaluate to true or false.
+In contrast to similar tools, speqs are typically framed as _questions_ about a program's behavior rather than _descriptions_ of what it does. The simplest way to run a single test is to use the method `pass?`, which accepts a string and a code block that should evaluate to true or false.
 
 ```ruby
-speq '2 is prime' { prime?(2) }
+pass?("Does Ruby properly calculate Euler's identity?") do
+  e = Math::E
+  π = Math::PI
+  i = (1i)
+
+  e**(i*π) + 1 == 0
+end
+
+# Passed (1/1)
+#   'Can Ruby show that e^iπ + 1 = 0?'
+```
+
+The above works, but it's not much shorter than existing solutions. More importantly, it's missing vital information about what action was taken, what the outcome was, and what assertion led to the success.
+
+```ruby
+speq(Math::E**((1i) * Math::PI) + 1, 'e^iπ + 1').eq?(0)
+# Passed (1/1)
+# 'Is 'e^iπ + 1' equal 0?' ( (0.0+0.0i) == 0 )
 ```
 
 ### Actions
 
-The above works, but it's not much better than existing solutions. Furthermore, the description should have easily been inferred from the action. To automatically generate descriptions of the action taken, we need only be a bit more explicit about the action:
+Descriptions for simple unit tests are often closely tied the semantics of the source code, and as such, Speq . To automatically generate descriptions, we can simply be a bit more explicit about the action of interest.
+
+More specifically, we can be explicit about the method/message, the arguments being passed, and the receiver by using the following methods:
+
+- message: `does(:symbol)` or `is(:symbol)`, default: `:itself`
+- arguments: `with(...)` or `of(...)`, default: `*[]`
+- receiver: `on(object, description(optional))`, default: `Object`
 
 ```ruby
 is(:prime?).of(2).true?
 
-on([3,2,1]).does(:sort).eq?([1, 2, 3])
+on((1..10)).does(:sort).eq?([1, 2, 3, 4])
+
+does(:new).with(4) {|idx| idx * idx}.on(Array).eq?([0, 1, 4, 9])
+
+# Alternative for when explicit description might be simpler:
+arr = Array.new(4) {|idx| idx * idx}
+
+on(arr, 'Array constructed with block').eq?([0,1,4,9])
 ```
 
-More specifically, we can be explicit about the method/message, the arguments being passed, and the receiver by using the following methods:
-
-- message/method: `does(:message)` or `is(:message)`
-- arguments (optional): `with(args)` or `of(args)`
-- receiver (optional, default: Object): `on`
-
-#### Ending an Action
-
-Actions begin when any of the methods above are invoked and are evaluated
-A
+Actions begin when any of the methods above are invoked. The action is evaluated when it reaches a matcher such as `eq?`. Note that matchers always end with a question mark.
 
 See [Matchers](#matchers) for a details of built-in matchers.
 
@@ -71,39 +92,73 @@ fake_bank = fake(
 )
 ```
 
-#### Consistent State
-
-```ruby
-let(:empty) { [] }
-let(:unsorted) { [3, 4, 2, 0, 1] }
-let(:random) { Array.new(10) { rand } }
-```
-
-#### Action Chains
-
-Typically, if may be sufficient to set up the program state
-
-Occasionally, we may want to describe an entire series of actions.
-
-#### Multiple testing pattern
+#### Test subject
 
 Speq has the distinct advantage of making it particularly easy to run many similar tests on the same subject.
+Opening a block on an action that has not been closed
+
+```ruby
+not_prime = [0, 1, 4, 6, 8, 9]
+prime = [2, 3, 5, 7]
+
+#
+does(:prime?) do
+  with[not_prime].false?
+  with[prime].true?
+end
+
+does(:my_sort) do
+  small_array = [3, 2, 1]
+  large_array = Array.new(10**6) {rand}
+
+  on(small_array).eq?(small_array.sort)
+  on(large_array).eq?(large_array.sort)
+end
+```
+
+#### Sugar
+
+```ruby
+# Action-Question Chains
+on('3 2 1')
+  << :split
+  << has?(length: 3)
+  << :map << with(&:to_i)
+  << :reduce << with(&:+)
+  << eq?(6)
+
+# Broadcasting
+def add(a, b)
+  a + b
+end
+
+a = [1, 2, 3]
+b = [4, 5, 6]
+
+does(:add).with[a,b].eq?([5, 7, 9])
+```
 
 ### Matchers
 
-### Examples
+`pass` is the most general
+
+#### Examples
+
+```ruby
+does(:rand).pass? {|val| val.is_a(Float)}
+```
 
 ```ruby
 does(:prime?).with(-1).raise?('Prime is not defined for negative numbers')
 
-on(User).does(:new).with(id: 1, name: 'user name').private?(:id)
+on(User).does(:new).with(id: 1, name: 'user name').has?(:id)
 ```
-
-Built in matchers allow for
 
 Matchers can be combined with the usual boolean operators: `not`, `and`, & `or`
 
 ```ruby
+pass?(*description, &block)
+
 eq?(obj)      # result == obj
 eql?(obj)     # result.eql?(obj)
 case_of?(obj) # result === obj
@@ -118,7 +173,9 @@ raise?('The following error message')
 raise?(ErrorClass)
 
 instance_of?(SomeClass)
-private?(:message)
+has?(*:message, **(message: val))
+
+map?()
 ```
 
 ## Usage
