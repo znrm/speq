@@ -2,12 +2,12 @@
 # respond to match, returning true for an expected return value of a unit test
 module Speq
   class Matcher
-    def initialize(expected)
-      @expected = expected
+    def initialize(expectation_proc)
+      @expectation_proc = expectation_proc
     end
 
-    def match(actual)
-      @expected[actual]
+    def match?(actual)
+      @expectation_proc[actual]
     end
 
     def self.truthy
@@ -22,11 +22,7 @@ module Speq
       Matcher.new(->(actual_value) { expected_value.eql?(actual_value) })
     end
 
-    def self.is(expected_object)
-      Matcher.new(->(actual_object) { expected_object.equal?(actual_object) })
-    end
-
-    def self.raises(expected_except)
+    def self.raise?(expected_except)
       case expected_except
       when Class
         raise_class(expected_except)

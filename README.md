@@ -84,7 +84,7 @@ is(:prime?).of(2).true?
 on((1..4).to_a.reverse).does(:sort).eq?([1, 2, 3, 4])
 
 # .with() accepts arguments with the exact same format as any other method
-does(:map).with { |idx| idx * idx }.on(1..4).eq?([0, 1, 4, 9])
+does(:map).with { |idx| idx * idx }.on(0..3).eq?([0, 1, 4, 9])
 
 # Passed (3/3)
 #   prime? of 2 is true.

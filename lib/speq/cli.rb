@@ -8,7 +8,6 @@ module Speq
 
     def initialize(cli_args)
       @files = find_files(cli_args)
-      @tests = []
     end
 
     def find_files(file_prefixes)
@@ -19,8 +18,6 @@ module Speq
 
     def run
       @files.each { |file| Speq.module_eval(File.read(file), file) }
-      @tests.each(&:report)
-      @tests.all?(&:passed?)
     end
   end
 end
