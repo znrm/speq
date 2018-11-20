@@ -4,8 +4,6 @@ require 'colorize'
 # Provides a CLI for running Speq
 module Speq
   class CLI
-    attr_accessor :tests
-
     def initialize(cli_args)
       @files = find_files(cli_args)
     end
@@ -18,6 +16,7 @@ module Speq
 
     def run
       @files.each { |file| Speq.module_eval(File.read(file), file) }
+      Speq.report
     end
   end
 end

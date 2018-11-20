@@ -1,4 +1,4 @@
-# The Fake class inludes a variety of doubles, mocks, stubs, etc.
+# The Fake class is a lightweight, general-purpose test double
 module Speq
   class Fake
     def initialize(mapping)

@@ -1,14 +1,25 @@
 require 'speq/action'
 
-# The Test class is a simple implementation of unit test block
+# A
 module Speq
   class Test
     def initialize
-      @units = []
+      @actions = []
+      @matchers = []
     end
 
     def passed?
-      @units.all?(&:passed?)
+      @matchers.all?(&:passed?)
+    end
+
+    def new_matcher(matcher)
+      @matchers << matcher
+      @matchers.last
+    end
+
+    def <<(action)
+      @actions << action
+      self
     end
   end
 end

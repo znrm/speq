@@ -102,7 +102,7 @@ on(1..4)
   .eq?([4, 3, 2, 1])
 
 # Passed (1/1)
-#   to_a on 1..4 then reverse (on [1, 2, 3, 4]) then sort on [4, 3, 2, 1] equals [1, 2, 3, 4]
+#   to_a on 1..4 then reverse (on [1, 2, 3, 4]) then sort (on [4, 3, 2, 1]) equals [1, 2, 3, 4].
 ```
 
 ### Matchers

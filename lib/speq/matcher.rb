@@ -10,15 +10,19 @@ module Speq
       @expectation_proc[actual]
     end
 
-    def self.truthy
+    def self.true?
+      Matcher.eq?(true)
+    end
+
+    def self.truthy?
       Matcher.new(->(actual_value) { actual_value ? true : false })
     end
 
-    def self.falsey
+    def self.falsy?
       Matcher.new(->(actual_value) { actual_value ? false : true })
     end
 
-    def self.eq(expected_value)
+    def self.eq?(expected_value)
       Matcher.new(->(actual_value) { expected_value.eql?(actual_value) })
     end
 

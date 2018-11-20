@@ -3,7 +3,7 @@ module Speq
   class Unit
     attr_reader :message, :receiver, :arguments
 
-    def initialize(message, receiver = Object, arguments = [], matcher)
+    def initialize(message = :itself, receiver = Object, arguments = [], matcher)
       @result = matcher.match(receiver.send(message, *arguments))
     rescue StandardError => exception
       @result = matcher.match(exception)
