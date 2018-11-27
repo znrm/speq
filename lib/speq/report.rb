@@ -1,31 +1,48 @@
 # The Report class produces and prints a report per test group
 module Speq
   class Report
-    def initialize(units)
-      @units = units
+    def initialize(tests)
+      @units = tests.flat_map(&:units)
+      @passed = []
+      @failed = []
+    end
+
+    def format_arguments(arguments)
+      argument_description = ''
+
+      unless arguments[:args].empty?
+        argument_description << "with '#{arguments[:args].join(', ')}'"
+      end
+      argument_description << ' and a block' if arguments[:block]
+      argument_description
+    end
+
+    def format_receiver(receiver)
+      receiver == Object ? '' : "on #{receiver} "
+    end
+
+    def unit_report(unit)
+      ['   ',
+       unit.message,
+       format_arguments(unit.arguments),
+       format_receiver(unit.receiver),
+       unit.phrase].join(' ')
     end
 
     def print_report
-      report_string = ''
-
       @units.each do |unit|
+        report = unit_report(unit)
+
         if unit.passed?
-          outcome = 'PASSED: '
-          color = :green
+          @passed << report.colorize(:green)
         else
-          outcome = 'FAILED: '
-          color = :red
+          @failed << report.colorize(:red)
         end
-
-        method = "calling '#{unit.message}' "
-        arguments = unit.arguments ? "with arguments: '#{unit.arguments}'" : ''
-        receiver = unit.receiver == Object ? '' : "on: #{unit.receiver} "
-
-        report_string <<
-          [outcome, method, arguments, receiver, "\n"].join.colorize(color)
       end
 
-      puts report_string
+      puts "Passed (#{@passed.length}/#{@units.length})" unless @passed.empty?
+      puts @passed
+      puts "Failed (#{@failed.length}/#{@units.length})" unless @failed.empty?
     end
   end
 end

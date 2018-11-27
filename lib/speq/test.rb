@@ -3,22 +3,18 @@ require 'speq/action'
 # A
 module Speq
   class Test
+    attr_reader :units
+
     def initialize
-      @actions = []
-      @matchers = []
+      @units = []
     end
 
     def passed?
-      @matchers.all?(&:passed?)
+      @units.all?(&:passed?)
     end
 
-    def new_matcher(matcher)
-      @matchers << matcher
-      @matchers.last
-    end
-
-    def <<(action)
-      @actions << action
+    def <<(unit)
+      @units << unit
       self
     end
   end
