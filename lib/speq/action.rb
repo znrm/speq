@@ -1,20 +1,31 @@
 require 'speq/matcher'
+require 'speq/unit'
 
 module Speq
   class Action
-    attr_accessor :message_queue, :receiver, :arguments_queue
+    attr_accessor :test_group, :message_queue, :receiver, :arguments_queue
 
-    def initialize(test_group, message = :itself, receiver = Object, arguments = {})
-      @test_group = test_group << self
+    def self.clone(action)
+      Action.new(
+        action.test_group.clone,
+        action.message_queue.clone,
+        action.receiver,
+        action.arguments_queue.clone
+      )
+    end
 
-      @message_queue = [message]
-      @arguments_queue = [arguments]
+    def initialize(test_group, messages = [:itself], receiver = Object, arguments = [{}])
+      @test_group = test_group
+
+      @message_queue = messages
+      @arguments_queue = arguments
       @receiver = receiver
     end
 
     def method_missing(method, *args, &block)
       if method.to_s.end_with?('?')
-        @test_group.new_matcher(Matcher.send(method, *args, &block))
+        matcher = Matcher.send(method, *args, &block)
+        @test_group << Unit.new(self, matcher)
       else
         super
       end
@@ -25,10 +36,10 @@ module Speq
         args = arguments_queue.shift
         message = message_queue.shift
 
-        @reciever = receiver.send(message, *args[:args], &args[:block])
+        @receiver = receiver.send(message, *args[:args], &args[:block])
       end
 
-      @reciever
+      @receiver
     end
 
     def on(receiver)

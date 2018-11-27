@@ -234,8 +234,8 @@ call([], 'an empty array')
 speq(my_arr).eq?([])
 
 # Passed (2/2)
-#   Is 'my class, an instance of the class Class' an instance of the class Class?
-#   Is 'my specific empty array' equal to 'an empty array'?
+#  'my class, an instance of the class Class' is an instance of the class Class.
+#  'my specific empty array' equals 'an empty array'
 ```
 
 #### Fakes

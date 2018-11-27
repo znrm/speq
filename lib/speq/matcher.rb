@@ -2,12 +2,20 @@
 # respond to match, returning true for an expected return value of a unit test
 module Speq
   class Matcher
-    def initialize(expectation_proc)
+    attr_reader :match_phrase
+
+    def initialize(expectation_proc, match_phrase)
       @expectation_proc = expectation_proc
+      @match_phrase = match_phrase
+      @result = false
     end
 
     def match?(actual)
       @expectation_proc[actual]
+    end
+
+    def self.pass?(&prc)
+      Matcher.new(prc)
     end
 
     def self.true?
@@ -23,7 +31,10 @@ module Speq
     end
 
     def self.eq?(expected_value)
-      Matcher.new(->(actual_value) { expected_value.eql?(actual_value) })
+      Matcher.new(
+        ->(actual_value) { expected_value.eql?(actual_value) },
+        'equals'
+      )
     end
 
     def self.raise?(expected_except)
