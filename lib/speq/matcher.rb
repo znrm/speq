@@ -16,6 +16,22 @@ module Speq
       @phrase[@actual]
     end
 
+    def self.method_missing(method_name, *args, &block)
+      if method_name.to_s.end_with?('?')
+        dynamic_matcher(method_name, *args, &block)
+
+      else
+        super
+      end
+    end
+
+    def self.dynamic_matcher(method_name, *args, &block)
+      Matcher.new(
+        ->(object) { object.send(method_name, *args, &block) },
+        proc { "passes: #{method_name}" }
+      )
+    end
+
     def self.pass?(&prc)
       Matcher.new(prc)
     end
