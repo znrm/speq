@@ -9,6 +9,7 @@ require 'speq/cli'
 
 module Speq
   @tests = [Test.new]
+  @descriptions = { Object => nil }
 
   def self.test(&block)
     self << Test.new
@@ -17,6 +18,10 @@ module Speq
 
   def self.<<(test)
     @tests << test
+  end
+
+  def self.descriptions
+    @descriptions
   end
 
   module_function

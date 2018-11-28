@@ -1,3 +1,4 @@
+require 'speq'
 require 'find'
 require 'colorize'
 
@@ -6,6 +7,7 @@ module Speq
   class CLI
     def initialize(cli_args)
       @files = find_files(cli_args)
+      run
     end
 
     def find_files(file_prefixes)

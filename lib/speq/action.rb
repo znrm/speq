@@ -1,20 +1,15 @@
-require 'speq/matcher'
-require 'speq/unit'
+require 'speq'
 
 module Speq
   class Action
     attr_accessor :test_group, :message_queue, :receiver, :arguments_queue
 
-    def self.clone(action)
-      Action.new(
-        action.test_group.clone,
-        action.message_queue.clone,
-        action.receiver,
-        action.arguments_queue.clone
-      )
-    end
-
-    def initialize(test_group, messages = [:itself], receiver = Object, arguments = [{}])
+    def initialize(
+      test_group,
+      receiver = Object,
+      messages = [:itself],
+      arguments = [{ args: [], block: nil }]
+    )
       @test_group = test_group
 
       @message_queue = messages
@@ -25,10 +20,19 @@ module Speq
     def method_missing(method, *args, &block)
       if method.to_s.end_with?('?')
         matcher = Matcher.send(method, *args, &block)
-        @test_group << Unit.new(self, matcher)
+        @test_group << Unit.new(clone, matcher)
       else
         super
       end
+    end
+
+    def clone
+      self.class.new(
+        test_group,
+        receiver,
+        message_queue.clone,
+        arguments_queue.clone
+      )
     end
 
     def result
@@ -42,15 +46,16 @@ module Speq
       @receiver
     end
 
-    def on(receiver)
+    def on(receiver, description = nil)
       @receiver = receiver
+      Speq.descriptions[receiver] = description || receiver
       self
     end
 
     def does(*messages)
       messages.each do |message|
         message_queue.push(message)
-        arguments_queue.push({})
+        arguments_queue.push(args: [], block: nil)
       end
 
       self
@@ -61,6 +66,29 @@ module Speq
       arguments_queue.last[:block] = block
 
       self
+    end
+
+    def format_arguments
+      arguments = arguments_queue.last
+      argument_description = ''
+
+      unless arguments[:args].empty?
+        argument_description << "with '#{arguments[:args].join(', ')}'"
+      end
+
+      argument_description << ' and a block' if arguments[:block]
+
+      argument_description
+    end
+
+    def format_receiver
+      Speq.descriptions[receiver] ? "on '#{Speq.descriptions[receiver]}'" : ''
+    end
+
+    def to_s
+      [message_queue.last, format_arguments, format_receiver]
+        .reject(&:empty?)
+        .join(' ')
     end
 
     alias is does

@@ -8,7 +8,7 @@ module Speq
     def initialize(action, matcher)
       @action = action
       @matcher = matcher
-      @result = matcher.match?(action_result)
+      @result = matcher.match?(action.clone.result)
     rescue StandardError => exception
       @result = matcher.match?(exception)
     end
@@ -17,24 +17,8 @@ module Speq
       @result
     end
 
-    def phrase
-      "#{matcher.match_phrase} #{action_result}"
-    end
-
-    def action_result
-      Action.clone(action).result
-    end
-
-    def message
-      action.message_queue.last
-    end
-
-    def arguments
-      action.arguments_queue.last
-    end
-
-    def receiver
-      action.receiver
+    def to_s
+      "#{action} #{matcher}"
     end
   end
 end

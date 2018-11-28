@@ -14,5 +14,9 @@ module Speq
         -> { return_value }
       end
     end
+
+    def to_s
+      description = send(:class) == self.class ? 'a fake' : "a fake#{send(:class)}"
+    end
   end
 end

@@ -2,16 +2,18 @@
 # respond to match, returning true for an expected return value of a unit test
 module Speq
   class Matcher
-    attr_reader :match_phrase
-
-    def initialize(expectation_proc, match_phrase)
-      @expectation_proc = expectation_proc
-      @match_phrase = match_phrase
-      @result = false
+    def initialize(expectation, phrase)
+      @expectation = expectation
+      @phrase = phrase
     end
 
     def match?(actual)
-      @expectation_proc[actual]
+      @actual = actual
+      @expectation[actual]
+    end
+
+    def to_s
+      @phrase[@actual]
     end
 
     def self.pass?(&prc)
@@ -33,7 +35,21 @@ module Speq
     def self.eq?(expected_value)
       Matcher.new(
         ->(actual_value) { expected_value.eql?(actual_value) },
-        'equals'
+        ->(actual_value) { "equals #{actual_value}" }
+      )
+    end
+
+    def self.have?(*symbols, **key_value_pairs)
+      new(
+        lambda do |object|
+          symbols.each { |symbol| return false unless object.respond_to?(symbol) }
+          key_value_pairs.each { |key, value| return false unless object.send(key) == value }
+        end,
+        proc do
+          properties = symbols.empty? ? '' : symbols.join(' ') + ', '
+          values = key_value_pairs.map { |key, value| "#{key}: #{value}" }.join(' ')
+          "has #{properties}#{values}"
+        end
       )
     end
 
