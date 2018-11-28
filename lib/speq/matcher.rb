@@ -28,7 +28,7 @@ module Speq
     def self.dynamic_matcher(method_name, *args, &block)
       Matcher.new(
         ->(object) { object.send(method_name, *args, &block) },
-        proc { "passes: #{method_name}" }
+        proc { "is #{method_name[0..-2]}" }
       )
     end
 

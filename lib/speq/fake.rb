@@ -16,7 +16,7 @@ module Speq
     end
 
     def to_s
-      description = send(:class) == self.class ? 'a fake' : "a fake#{send(:class)}"
+      'a fake'
     end
   end
 end

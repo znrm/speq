@@ -9,7 +9,7 @@ Speq favors simplicity and minimalism.
 ```ruby
 is(Array.new).empty?
 # Passed (1/1)
-#   [] is empty.
+#   '[]' is empty.
 ```
 
 But also values flexibility.
@@ -89,7 +89,7 @@ does(:map).with { |idx| idx * idx }.on(0..3).eq?([0, 1, 4, 9])
 # Passed (3/3)
 #   prime? of 2 is true.
 #   sort on [4, 3, 2, 1] equals [1, 2, 3, 4].
-#   map with a block on 1..4 equals [0, 1, 4, 9].
+#   map and a block on 0..3 equals [0, 1, 4, 9].
 ```
 
 Chaining methods can be accomplished by providing multiple symbols. If an intermediate value needs to be tested or a method needs to be given arguments, this can be accomplished by using `.then(:next_method).with`. An example of this is shown below. An alternative, unconventional syntax for accomplishing the same can be found in the section on [syntactic sugar](#Sugar)

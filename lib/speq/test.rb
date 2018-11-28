@@ -17,5 +17,9 @@ module Speq
       @units << unit
       self
     end
+
+    def inspect
+      @units.map(&:inspect)
+    end
   end
 end

@@ -9,7 +9,7 @@ require 'speq/cli'
 
 module Speq
   @tests = [Test.new]
-  @descriptions = { Object => nil }
+  @descriptions = {}
 
   def self.test(&block)
     self << Test.new
@@ -34,11 +34,19 @@ module Speq
     end
   end
 
+  def debug
+    p @tests
+  end
+
   def report
     Report.new(@tests).print_report
   end
 
   def fake(**mapping)
     Fake.new(mapping)
+  end
+
+  def matcher_method?(method_name)
+    method_name.to_s.end_with?('?')
   end
 end

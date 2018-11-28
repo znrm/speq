@@ -18,7 +18,11 @@ module Speq
     end
 
     def to_s
-      "#{action} #{matcher}"
+      "    #{action} #{matcher}."
+    end
+
+    def inspect
+      { action: @action, result: @result, matcher: matcher.to_s }
     end
   end
 end

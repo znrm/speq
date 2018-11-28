@@ -1,97 +1,93 @@
 require 'speq'
+require 'speq/message'
 
 module Speq
   class Action
-    attr_accessor :test_group, :message_queue, :receiver, :arguments_queue
+    attr_reader :test_group, :receiver, :messages
 
-    def initialize(
-      test_group,
-      receiver = Object,
-      messages = [:itself],
-      arguments = [{ args: [], block: nil }]
-    )
+    def initialize(test_group, receiver = Object, messages = [])
       @test_group = test_group
-
-      @message_queue = messages
-      @arguments_queue = arguments
       @receiver = receiver
+      @messages = messages
     end
 
-    def method_missing(method, *args, &block)
-      if method.to_s.end_with?('?')
-        matcher = Matcher.send(method, *args, &block)
+    def method_missing(method_name, *args, &block)
+      if Speq.matcher_method?(method_name)
+        matcher = Matcher.send(method_name, *args, &block)
         @test_group << Unit.new(clone, matcher)
+        self
       else
         super
       end
     end
 
     def clone
-      self.class.new(
-        test_group,
-        receiver,
-        message_queue.clone,
-        arguments_queue.clone
-      )
+      Action.new(test_group, receiver, messages.clone)
     end
 
     def result
-      until @message_queue.empty?
-        args = arguments_queue.shift
-        message = message_queue.shift
-
-        @receiver = receiver.send(message, *args[:args], &args[:block])
+      messages.reduce(@receiver) do |receiver, message|
+        message.send_to(receiver)
       end
-
-      @receiver
     end
 
     def on(receiver, description = nil)
       @receiver = receiver
-      Speq.descriptions[receiver] = description || receiver
+      Speq.descriptions[receiver] = description || "'#{receiver}'"
       self
     end
 
-    def does(*messages)
-      messages.each do |message|
-        message_queue.push(message)
-        arguments_queue.push(args: [], block: nil)
+    def does(*methods)
+      methods.each do |method|
+        if messages.empty? || messages.last.has_method?
+          messages << Message.new(method: method)
+        else
+          messages.last << method
+        end
+      end
+
+      self
+    end
+
+    def is(method_or_receiver, description = nil)
+      if Symbol === method_or_receiver && !description
+        does(method_or_receiver)
+      else
+        on(method_or_receiver, description)
       end
 
       self
     end
 
     def with(*args, &block)
-      arguments_queue.last[:args] = args
-      arguments_queue.last[:block] = block
+      if messages.last.has_args?
+        messages << Message.new(args: args, block: block)
+      else
+        messages.last << args
+        messages.last << block
+      end
 
       self
     end
 
-    def format_arguments
-      arguments = arguments_queue.last
-      argument_description = ''
-
-      unless arguments[:args].empty?
-        argument_description << "with '#{arguments[:args].join(', ')}'"
-      end
-
-      argument_description << ' and a block' if arguments[:block]
-
-      argument_description
+    def then(*methods)
+      does(*methods)
     end
 
     def format_receiver
-      Speq.descriptions[receiver] ? "on '#{Speq.descriptions[receiver]}'" : ''
+      return '' unless Speq.descriptions[receiver]
+
+      (messages.last&.has_method? ? 'on ' : '') + Speq.descriptions[receiver]
     end
 
     def to_s
-      [message_queue.last, format_arguments, format_receiver]
-        .reject(&:empty?)
-        .join(' ')
+      [messages.last.to_s, format_receiver].reject(&:empty?).join(' ')
     end
 
-    alias is does
+    def inspect
+      { receiver: receiver, messages: messages }
+    end
+
     alias of with
   end
 end
