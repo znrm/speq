@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    speq (0.3.2)
+    speq (0.4.0)
       colorize (~> 0.8.1)
 
 GEM
@@ -25,4 +25,4 @@ DEPENDENCIES
   speq!
 
 BUNDLED WITH
-   1.16.6
+   1.17.1

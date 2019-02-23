@@ -1,5 +1,5 @@
-# The Fake class is a lightweight, general-purpose test double
 module Speq
+  # The Fake class is a lightweight, general-purpose test double
   class Fake
     def initialize(mapping)
       mapping.each do |method_name, return_value|

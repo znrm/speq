@@ -1,52 +1,32 @@
 require 'speq/version'
 require 'speq/test'
-require 'speq/matcher'
-require 'speq/report'
-require 'speq/unit'
 require 'speq/fake'
-require 'speq/action'
-require 'speq/cli'
 
+# Build specs with fewer words
 module Speq
-  @tests = [Test.new]
-  @descriptions = {}
-
   def self.test(&block)
-    self << Test.new
-    module_exec(&block)
-  end
-
-  def self.<<(test)
-    @tests << test
-  end
-
-  def self.descriptions
-    @descriptions
+    Test.new(&block)
   end
 
   module_function
 
-  def method_missing(method_name, *args, &block)
-    if Action.instance_methods.include?(method_name)
-      Action.new(@tests.last).send(method_name, *args, &block)
-    else
-      super
-    end
+  def speq(*args)
+    Test.new { speq(*args) }
   end
 
-  def debug
-    p @tests
+  def is(*args, &block)
+    Test.new { is(*args, &block) }
   end
 
-  def report
-    Report.new(@tests).print_report
+  def on(*args, &block)
+    Test.new { on(*args, &block) }
   end
 
-  def fake(**mapping)
-    Fake.new(mapping)
+  def does(*args, &block)
+    Test.new { does(*args, &block) }
   end
 
-  def matcher_method?(method_name)
-    method_name.to_s.end_with?('?')
+  def fake(**mappings)
+    Fake.new(**mappings)
   end
 end
