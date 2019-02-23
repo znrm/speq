@@ -14,9 +14,5 @@ module Speq
         -> { return_value }
       end
     end
-
-    def to_s
-      'a fake'
-    end
   end
 end

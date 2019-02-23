@@ -1,5 +1,5 @@
-# The Report class produces and prints a report per test group
 module Speq
+  # The Report class produces and prints a report per test group
   class Report
     def initialize(tests)
       @units = tests.flat_map(&:units)
