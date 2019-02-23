@@ -1,12 +1,12 @@
-require 'speq/action'
-
-# A
 module Speq
+  # Test is initialized with units.
+  # Units must implement #passed?
   class Test
     attr_reader :units
 
-    def initialize
-      @units = []
+    # @param units [Array[Unit|Test]]
+    def initialize(units = [])
+      @units = units
     end
 
     def passed?

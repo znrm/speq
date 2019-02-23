@@ -7,7 +7,7 @@ Speq is a testing library for rapid prototyping in Ruby.
 Speq favors simplicity and minimalism.
 
 ```ruby
-is(Array.new).empty?
+is([]).empty?
 # Passed (1/1)
 #   '[]' is empty.
 ```
@@ -74,7 +74,7 @@ Descriptions for simple unit tests are often closely tied to the source code, an
 
 More specifically, we begin by setting up the program state and then explicitly supply the action being tested using the methods below. By breaking down the expression's method/message, arguments, and receiver, Speq can use the additional information to help generate an often sufficiently detailed description of the test. Actions are evaluated when they reach a [matcher](#matchers).
 
-- message: `does(*:symbol` or `is(*:symbol)`, default: `:itself`
+- message: `does(*:symbol)` or `is(*:symbol)`, default: `:itself`
 - arguments: `with(...)` or `of(...)`, default: `*[]`
 - receiver: `on(object, description(optional))`, default: `Object`
 

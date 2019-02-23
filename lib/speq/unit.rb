@@ -1,20 +1,27 @@
-require 'speq/action'
-
-# The Unit class is responsible for running a test and storing the result
 module Speq
+  # The Unit class is responsible for running a test and storing the result
   class Unit
     attr_reader :result, :action, :matcher
-
+    # A unit is initialized with an action and matcher.
+    # @param action [Action]
+    # @param matcher [Matcher]
     def initialize(action, matcher)
       @action = action
       @matcher = matcher
-      @result = matcher.match?(action.clone.result)
-    rescue StandardError => exception
-      @result = matcher.match?(exception)
+      @has_run = false
+    end
+    
+    def passed?
+      run unless @has_run
+      @result
     end
 
-    def passed?
-      @result
+    def run
+      @result = matcher.match?(action)
+    rescue StandardError => exception
+      @result = matcher.match?(exception)
+    ensure
+      @has_run = true
     end
 
     def to_s
