@@ -14,15 +14,11 @@ module Speq
     def method_missing(method_name, *args, &block)
       if Speq.matcher_method?(method_name)
         matcher = Matcher.send(method_name, *args, &block)
-        @test_group << Unit.new(clone, matcher)
+        @test_group << Unit.new(self, matcher)
         self
       else
         super
       end
-    end
-
-    def clone
-      Action.new(test_group, receiver, messages.clone)
     end
 
     def result
@@ -31,22 +27,30 @@ module Speq
       end
     end
 
-    def on(receiver, description = nil)
+    def on(receiver, description = nil, &block)
       @receiver = receiver
       Speq.descriptions[receiver] = description || "'#{receiver}'"
+      instance_exec(&block) if block
       self
     end
 
     def does(*methods)
       methods.each do |method|
-        if messages.empty? || messages.last.has_method?
+        if messages.empty?
           messages << Message.new(method: method)
+          self
+        elsif messages.last.has_method?
+          new_self = clone
+          new_self.does(*methods)
+          new_self
+
         else
           messages.last << method
+          self
         end
       end
 
-      self
+      
     end
 
     def is(method_or_receiver, description = nil)

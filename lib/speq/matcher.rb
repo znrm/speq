@@ -33,7 +33,10 @@ module Speq
     end
 
     def self.pass?(&prc)
-      Matcher.new(prc)
+      Matcher.new(
+        prc,
+        proc { 'passes' }
+      )
     end
 
     def self.true?
@@ -81,12 +84,16 @@ module Speq
     end
 
     def self.raise_class(expected_error)
-      Matcher.new(->(actual_except) { actual_except.class <= expected_error })
+      Matcher.new(
+        ->(actual_except) { actual_except.class <= expected_error },
+        ->(actual_except) { "raises #{actual_except}" }
+      )
     end
 
     def self.raise_message(expected_message)
       Matcher.new(
-        ->(actual_except) { actual_except.message == expected_message }
+        ->(actual_except) { actual_except.message == expected_message },
+        ->(actual_except) { "raises #{actual_except}" }
       )
     end
   end
