@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    speq (0.4.0)
+    speq (0.5.0)
       colorize (~> 0.8.1)
 
 GEM

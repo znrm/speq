@@ -63,7 +63,7 @@ The above works, but it's not much shorter than existing solutions. More importa
 Shown below is the basic two-part pattern for most speqs and the resulting report combining explicit and implicit descriptions:
 
 ```ruby
-speq(Math::E**((1i) * Math::PI ) + 1, 'e^iπ + 1').eq?(0)
+is(Math::E**((1i) * Math::PI ) + 1, 'e^iπ + 1').eq?(0)
 # Passed (1/1)
 #     e^iπ + 1 is equal to 0. ( (0.0+0.0i) == 0 )
 ```
@@ -261,8 +261,8 @@ prime = [2, 3, 5, 7]
 
 #
 does(:prime?) do
-  with[not_prime].false?
-  with[prime].true?
+  with(not_prime).false?
+  with(prime).true?
 end
 
 does(:my_sort) do
@@ -297,7 +297,7 @@ end
 a = [1, 2, 3]
 b = [4, 5, 6]
 
-does(:add).with[a, b].eq?([5, 7, 9])
+does(:add).with(a, b).eq?([5, 7, 9])
 ```
 
 ## Usage

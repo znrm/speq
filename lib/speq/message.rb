@@ -34,9 +34,9 @@ module Speq
     def to_s
       message_string = ''
       message_string += @method.to_s if has_method?
-      message_string += " with '#{@args.join(', ')}'" unless @args.empty?
-      message_string += ' and a block' if @block
+      message_string += " with '#{@args.join(', ')}'" unless @args.empty
+      message_string += ' and a block)' if @block
       message_string
-  end
+    end
   end
 end

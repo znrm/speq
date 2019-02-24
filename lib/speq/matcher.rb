@@ -1,6 +1,6 @@
-# The Match class includes factory methods for generating objects that
-# respond to match, returning true for an expected return value of a unit test
 module Speq
+  # The Matcher class includes factory methods for generating objects that
+  # respond to #match?
   class Matcher
     def initialize(expectation, phrase)
       @expectation = expectation
@@ -8,24 +8,18 @@ module Speq
     end
 
     def match?(actual)
-      @actual = actual
       @expectation[actual]
     end
 
-    def to_s
-      @phrase[@actual]
+    def inspect
+      @phrase[]
     end
 
-    def self.method_missing(method_name, *args, &block)
-      if method_name.to_s.end_with?('?')
-        dynamic_matcher(method_name, *args, &block)
-
-      else
-        super
-      end
+    def self.matcher_method?(method_name)
+      method_name.to_s.end_with?('?')
     end
 
-    def self.dynamic_matcher(method_name, *args, &block)
+    def self.for(method_name, *args, &block)
       Matcher.new(
         ->(object) { object.send(method_name, *args, &block) },
         proc { "is #{method_name[0..-2]}" }
