@@ -7,9 +7,10 @@ module Speq
   class Test
     attr_reader :units
 
-    def initialize(units = [], context = {}, &block)
-      @units = units
+    def initialize(context = {}, &block)
+      @units = []
       @context = context
+      puts block_given?
       instance_exec(&block) if block_given?
     end
 
@@ -19,88 +20,52 @@ module Speq
 
     def score; end
 
+    def respond_to_missing?(method_name, include_private = false)
+      Matcher.matcher_method?(method_name) || Speq.respond_to?(method_name) || super
+    end
+
     def method_missing(method_name, *args, &block)
-      if matcher_method?(method_name)
-        puts 'detected matcher method'
-      # matcher = Matcher.send(method_name, *args, &block)
-      # @units << Unit.new(self, matcher)
-      # self
+      if Matcher.matcher_method?(method_name)
+        self << ({ matcher: Matcher.for(method_name, *args, &block) })
       elsif Speq.respond_to?(method_name)
-        puts Speq.send(method_name, *args, &block)
+        Speq.send(method_name, *args, &block)
       else
         super
       end
     end
 
-    def is
-      puts 'is'
+    def is(method_or_receiver, description = nil)
+      if Symbol === method_or_receiver && !description
+        does(method_or_receiver)
+      else
+        on(method_or_receiver, description)
+      end
+    end
+
+    def on(receiver, description = nil, &block)
+      @context[receiver] = description || "'#{receiver}'"
+      self << ({ on: receiver })
+      self << Test.new(@context, &block) if block_given?
       self
     end
 
-    def on
-      self << Message.new
-      puts 'on'
-      self
+    def does(*methods)
+      self << ({ does: methods })
     end
 
-    # def on(receiver, description = nil, &block)
-    #   @receiver = receiver
-    #   Speq.descriptions[receiver] = description || "'#{receiver}'"
-    #   instance_exec(&block) if block
-    #   self
-    # end
-
-    def does
-      self << Action.new
-      puts 'does'
-      self
+    def then(*methods)
+      does(*methods)
     end
-
-    # def does(*methods)
-    #   methods.each do |method|
-    #     if messages.empty?
-    #       messages << Message.new(method: method)
-    #       self
-    #     elsif messages.last.has_method?
-    #       new_self = clone
-    #       new_self.does(*methods)
-    #       new_self
-    #     else
-    #       messages.last << method
-    #       self
-    #     end
-    #   end
-    # end
 
     def with
-      puts 'with'
-      self
+      self << ({ with: Message.new(args: args, block: block) })
     end
 
     alias of with
 
-    # def with(*args, &block)
-    #   if messages.last.has_args?
-    #     messages << Message.new(args: args, block: block)
-    #   else
-    #     messages.last << args
-    #     messages.last << block
-    #   end
-
-    #   self
-    # end
-
-    def matcher_method?(method_name)
-      method_name.to_s.end_with?('?')
-    end
-
-    def <<(unit)
-      @units << unit
+    def <<(many_things)
+      @units << many_things
       self
-    end
-
-    def hello
-      puts 'should be private'
     end
   end
 end
@@ -111,10 +76,6 @@ end
 
 # def inspect
 #   "Test: #{{ units: @units }}"
-# end
-
-# def then(*methods)
-#   does(*methods)
 # end
 
 # attr_reader :units, :receiver, :messages
@@ -129,16 +90,6 @@ end
 #   messages.reduce(@receiver) do |receiver, message|
 #     message.send_to(receiver)
 #   end
-# end
-
-# def is(method_or_receiver, description = nil)
-#   if Symbol === method_or_receiver && !description
-#     does(method_or_receiver)
-#   else
-#     on(method_or_receiver, description)
-#   end
-
-#   self
 # end
 
 # def format_receiver
