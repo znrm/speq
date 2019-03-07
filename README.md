@@ -1,5 +1,7 @@
 # Speq
 
+__Undergoing rewrite, currently non-functional!__
+
 ## Build specs with fewer words
 
 Speq is a testing library for rapid prototyping in Ruby.
