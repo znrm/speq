@@ -6,15 +6,22 @@ module Speq
   class Test
     attr_reader :units, :context
 
-    def self.parse(context = {}, &block)
+    def self.parse(context, &block)
       Test.new(context, &block).units
     end
 
     def initialize(context = {}, &block)
-      @units = [{}]
+      @units = []
       @names = {}
       @context = context
+      
+      parse_units(&block)
+    end
+
+    def parse_units(&block)
+      new_unit
       instance_exec(&block) if block_given?
+      current_unit.merge!(@context)
     end
 
     def passed?
@@ -57,6 +64,7 @@ module Speq
 
     def on(receiver, description = nil, &block)
       call(receiver, description) if description
+      
       record(:on, receiver)
       test(&block) if block_given?
       self
@@ -73,7 +81,9 @@ module Speq
     end
 
     def test(&block)
-      record(:test, *Test.parse(current_unit, &block))
+      context = units.pop
+      nested_units = Test.parse(context, &block)
+      record(:test, *nested_units)
     end
 
     def is(method_or_receiver, description = nil)
@@ -99,7 +109,6 @@ module Speq
         units << current_unit.clone if context[:match]
         current_unit[:match] = args
       when :test
-        units.pop
         args.each { |nested_unit| units << nested_unit }
       when :speq
         units << { speq: args } << {}
