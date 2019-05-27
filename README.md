@@ -1,6 +1,6 @@
 # Speq
 
-__Undergoing rewrite, currently non-functional!__
+**Undergoing rewrite, currently non-functional!**
 
 ## Build specs with fewer words
 
@@ -45,15 +45,15 @@ Or install it yourself as:
 
 Speq is loosely based on the given-when-then or arrange-act-assert testing pattern. Speq's design choices are guided by the competing motivations of having tests be as short and simple as possible while maintaining the flexibility to be as descriptive as needed.
 
-In contrast to similar tools, speqs are typically framed as _questions_ about a program's behavior rather than assertions about the desired behavior. The most basic test involves passing a string to the method `speq` followed by `pass?` and a block that evaluates strictly to true or false.
+In contrast to similar tools, speqs are typically framed as _questions_ about a program's behavior rather than assertions about the desired behavior. The most basic test involves passing a description to the method `speq` followed by a block.
 
 ```ruby
-speq("Does Ruby properly calculate Euler's identity?").pass? do
+speq("Does Ruby properly calculate Euler's identity?") do
   e = Math::E
   π = Math::PI
   i = (1i)
 
-  e**(i*π) + 1 == 0
+  true?(e**(i*π) + 1 == 0)
 end
 
 # Passed (1/1)

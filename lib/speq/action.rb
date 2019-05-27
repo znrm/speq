@@ -1,4 +1,5 @@
 module Speq
-  class Action
-  end
+class Action
+  def initializate
+end
 end

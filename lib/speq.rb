@@ -10,22 +10,6 @@ module Speq
 
   module_function
 
-  def speq(*args)
-    Test.new { speq(*args) }
-  end
-
-  def is(*args, &block)
-    Test.new { is(*args, &block) }
-  end
-
-  def on(*args, &block)
-    Test.new { on(*args, &block) }
-  end
-
-  def does(*args, &block)
-    Test.new { does(*args, &block) }
-  end
-
   def fake(**mappings)
     Fake.new(**mappings)
   end

@@ -2,6 +2,7 @@ module Speq
   # The Unit class is responsible for running a test and storing the result
   class Unit
     attr_reader :result, :action, :matcher
+
     def initialize(does, on, match)
       @action = action
       @matcher = matcher

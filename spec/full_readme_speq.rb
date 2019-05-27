@@ -90,13 +90,13 @@ does(:prime?) do
   with(prime).true?
 end
 
-# does(:my_sort) do
-#   small_array = [3, 2, 1]
-#   large_array = Array.new(10) { rand }
+does(:my_sort) do
+  small_array = [3, 2, 1]
+  large_array = Array.new(10) { rand }
 
-#   on(small_array).eq?(small_array.sort)
-#   on(large_array).eq?(large_array.sort)
-# end
+  on(small_array).eq?(small_array.sort)
+  on(large_array).eq?(large_array.sort)
+end
 
 # def add(a, b)
 #   a + b
