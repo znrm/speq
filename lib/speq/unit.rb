@@ -3,31 +3,31 @@ module Speq
   class Unit
     attr_reader :result, :action, :matcher
 
-    def initialize(does, on, match)
+    def initialize(action, matcher)
       @action = action
       @matcher = matcher
-      @has_run = false
+      run
     end
 
     def passed?
-      run unless @has_run
-      @result
     end
 
     def run
-      @result = matcher.match?(action)
+      @result = matcher.match?(action.evaluate)
+      p @result
     rescue StandardError => exception
+      p exception
       @result = matcher.match?(exception)
     ensure
       @has_run = true
     end
 
     def to_s
-      "    #{action} #{matcher}."
+      "    #{action.to_s} #{matcher.to_s}."
     end
 
     def inspect
-      { action: @action, result: @result, matcher: matcher.to_s }
+      { action: @action, matcher: matcher, result: @result }
     end
   end
 end

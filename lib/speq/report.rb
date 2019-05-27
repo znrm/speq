@@ -1,4 +1,5 @@
-require 'pp'
+require "pp"
+
 module Speq
   # The Report class produces and prints a report per test group
   class Report
@@ -8,6 +9,10 @@ module Speq
 
     def inspect
       @tests.each { |test| pp test }
+    end
+
+    def print
+      @tests.each { |test| test.units.each { |unit| puts unit.to_s } }
     end
   end
 end

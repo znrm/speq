@@ -1,5 +1,7 @@
 require "speq/fake"
 require "speq/matcher"
+require "speq/action"
+require "speq/unit"
 
 module Speq
   # Core class that handles building up tests
@@ -13,6 +15,10 @@ module Speq
 
       new_unit
       parse_units(&block) if block_given?
+      @units.map! do |commands|
+        action = Action.new(**commands)
+        Unit.new(action, commands[:match])
+      end
     end
 
     def parse_units(&block)
@@ -36,7 +42,7 @@ module Speq
 
     def method_missing(method_name, *args, &block)
       if Matcher.matcher_method?(method_name)
-        record(:match, method_name, *args, &block)
+        match(Matcher.for(method_name, *args, &block))
       elsif Speq.respond_to?(method_name)
         Speq.send(method_name, *args, &block)
       else
@@ -56,7 +62,9 @@ module Speq
     def on(receiver, description = nil, &block)
       call(receiver, description) if description
 
-      record(:on, receiver)
+      new_unit_if_needed(:on)
+      current_unit[:on] = receiver
+
       test(&block) if block_given?
       self
     end
@@ -68,7 +76,8 @@ module Speq
     end
 
     def with(*args, &block)
-      record :with, args: args, block: block
+      new_unit_if_needed(:with)
+      current_unit[:with] = [*args, block]
     end
 
     def test(&block)
@@ -92,18 +101,16 @@ module Speq
       self
     end
 
+    def match(matcher)
+      units << current_unit.clone if current_unit[:match] || context[:match]
+      current_unit[:match] = matcher
+      self
+    end
+
     alias of with
 
-    def record(command, *args)
-      case command
-      when :on, :does, :with
-        new_unit if current_unit[command] || current_unit[:match] || context[command]
-        current_unit[command] = args
-      when :match
-        units << current_unit.clone if current_unit[:match] || context[:match]
-        current_unit[:match] = args
-      end
-      self
+    def new_unit_if_needed(command)
+      new_unit if current_unit[command] || current_unit[:match] || context[command]
     end
 
     def current_unit
