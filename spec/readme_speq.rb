@@ -1,16 +1,31 @@
-require_relative 'examples'
+# frozen_string_literal: true
 
-is([]).empty?
+on((1..4).to_a.shuffle, 'a shuffled array').does(:sort) do
+  eq?([1, 2, 3, 4])
+  with { |a, b| b <=> a }.eq?([4, 3, 2, 1])
+end
 
-is(:prime?).of(2).true?
-on((1..4).to_a.reverse).does(:sort).eq?([1, 2, 3, 4])
-does(:map).with { |idx| idx * idx }.on(0..3).eq?([0, 1, 4, 9])
+is(Math::E**(1i * Math::PI) + 1, 'e^iπ + 1').eq?(0)
 
-on(1..4)
-  .does(:to_a, :shuffle, :sort)
-  .eq?([1, 2, 3, 4])
-  .then(:sort).with { |a, b| b <=> a }
-  .eq?([4, 3, 2, 1])
+def prime?(num)
+  raise 'Prime is not defined for negative numbers' if num.negative?
+
+  highest = Math.sqrt(num).to_i
+
+  (2..highest).none? { |factor| (num % factor).zero? }
+end
+
+speq(Array) do
+  is([]).empty?
+  does(:map).with { |idx| idx * idx }.on(0..3).eq?([0, 1, 4, 9])
+  is(Array(nil), 'An array created by calling "Array(nil)"').eq?([nil])
+  does(:Array).with(nil).eq?([nil])
+end
+
+on(self).is(:prime?) do
+  of(2).true?
+  of(-1).raise?('Prime is not defined for negative numbers')
+end
 
 on('3 2 1') do
   does(:split).have?(length: 3)
@@ -19,11 +34,7 @@ end
 
 does(:strip)
   .on(' speq ')
-  .pass? { |str| str == 'speq' && !str.include?(' ') }
+  .eq?('speq')
+  .match?('not including space') { |str| !str.include?(' ') }
 
-does(:rand)
-  .pass? { |val| val.is_a?(Float) }
-
-does(:prime?)
-  .with(-1)
-  .raise?('Prime is not defined for negative numbers')
+is(1.0).a?(Float)

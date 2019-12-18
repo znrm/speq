@@ -26,7 +26,8 @@ module Speq
     end
 
     def method_missing(method_name, *args, &block)
-      if METHODS.include?(method_name)
+      if METHODS.include?(method_name) ||
+         @parent.context && Question.question?(method_name)
         Expression.new(@parent).send(method_name, *args, &block)
       elsif @outer_scope.respond_to?(method_name)
         @outer_scope.send(method_name, *args, &block)
@@ -113,19 +114,19 @@ module Speq
       self.result = full_context.evaluate
     end
 
-    def speq(description, &block)
+    def speq(description = "#{context}...", &block)
       parent << Test.new(description, self, &block)
     end
 
     def on(val, description = nil)
       context.subject = Subject.new(val, description)
-      speq(context.to_s + '...', &proc) if block_given?
+      speq(&proc) if block_given?
       self
     end
 
     def does(val, description = nil)
       context.message = Message.new(val, description)
-      speq(context.to_s, &proc) if block_given?
+      speq(&proc) if block_given?
       self
     end
 

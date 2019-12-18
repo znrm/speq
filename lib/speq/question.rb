@@ -27,7 +27,7 @@ module Speq
     def phrase
       matcher.phrase(result)
     rescue StandardError => e
-      QuestionError.new(@question_name, e.to_s).to_s
+      QuestionError.new(@question_name, e.inspect).to_s
     end
 
     def outcome
@@ -75,6 +75,10 @@ module Speq
       end
     end
 
+    def self.match?(description, &block)
+      new(block, "matches #{description}", "does not match #{description}")
+    end
+
     def self.result_matcher(question_name, *args, &block)
       new(
         lambda do |obj|
@@ -82,7 +86,7 @@ module Speq
             return obj.send(question_name, *args, &block)
           end
 
-          raise "Cannot find pre-defined question called #{question_name} or existing method on #{obj}"
+          raise "No question called #{question_name.inspect} or existing method on #{obj.inspect}"
         end,
         "is #{question_name[0..-2]}",
         "is not #{question_name[0..-2]}"
@@ -92,8 +96,8 @@ module Speq
     def self.eq?(expected_value)
       new(
         ->(result) { expected_value == result },
-        "equals #{expected_value}",
-        "does not equal #{expected_value}"
+        "equals #{expected_value.inspect}",
+        "does not equal #{expected_value.inspect}"
       )
     end
 
@@ -109,11 +113,9 @@ module Speq
       matcher_is(->(actual_value) { actual_value ? false : true }, 'falsey')
     end
 
-    def a?(type)
+    def self.a?(type)
       matcher_is(->(val) { val.is_a?(type) }, "a #{type}")
     end
-
-    alias an? a?
 
     def self.have?(*symbols, **key_value_pairs)
       new(
@@ -125,8 +127,8 @@ module Speq
             return false unless object.send(key) == value
           end
         end,
-        "has all #{symbols}#{key_value_pairs}",
-        "doesn't have all #{symbols}#{key_value_pairs}"
+        "has all #{symbols.empty? ? nil : symbols}#{key_value_pairs}",
+        "doesn't have all #{symbols.empty? ? nil : symbols}#{key_value_pairs}"
       )
     end
 
@@ -152,8 +154,8 @@ module Speq
     def self.raise_message(expected_message)
       Matcher.new(
         ->(actual_except) { actual_except.message == expected_message },
-        "raises #{expected_message}",
-        "does not raise #{expected_message}"
+        "raises #{expected_message.inspect}",
+        "does not raise #{expected_message.inspect}"
       )
     end
   end

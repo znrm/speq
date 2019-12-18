@@ -103,7 +103,7 @@ module Speq
     end
 
     def evaluate
-      obj = subject&.value || Object
+      obj = subject&.value
       msg = message&.value
       args = arguments&.args
       block = arguments&.block
@@ -119,11 +119,11 @@ module Speq
       if !msg
         obj
       elsif !args
-        obj.public_send(msg)
+        obj&.public_send(msg) || send(msg)
       elsif !block
-        obj.public_send(msg, *args)
+        obj&.public_send(msg, *args) || send(msg, *args)
       else
-        obj.public_send(msg, *args, &block)
+        obj&.public_send(msg, *args, &block) || send(msg, *args, &block)
       end
     end
   end

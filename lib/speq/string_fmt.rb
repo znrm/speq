@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
 require 'colorize'
-require 'pp'
 
 module Speq
+  class TestBlock
+    def inspect
+      "block in '#{@parent.description}'"
+    end
+  end
+
   class Group
     def report
       outcome.report
@@ -20,23 +25,28 @@ module Speq
 
   class Test < Group
     def title
-      "#{outcome} #{description}".send(pass? ? :green : :red)
+      "#{outcome} #{description}"
     end
 
     def to_s
-      [newline, title, units.join(''), newline].join('')
+      [newline, title, units.join('')].join('')
     end
   end
 
   class Expression < Group
+    def indent
+      parent.indent
+    end
+
     def to_s
-      "#{newline}#{context} #{units.length > 1 ? "#{indent}..." : ''}" + units.join('')
+      "#{newline}  #{outcome} #{context} #{units.join('; ')}."
     end
   end
 
   class Question
     def to_s
-      phrase.send(outcome.pass? ? :green : :red)
+      "#{phrase}#{outcome.fail? ? " (result = #{result.inspect})" : ''}"
+        .send(outcome.pass? ? :green : :red)
     end
   end
 
@@ -46,51 +56,37 @@ module Speq
     end
 
     def to_s
-      pass? ? '✔' : 'x'
+      pass? ? '✔'.green : 'x'.red
     end
   end
 
   class Arguments
-    def pretty_print(pp)
-      pp.text '('
-      pp.seplist(args)
-      pp.text ',' if !args.empty? && block
-      pp.text if block
-      pp.text ')'
-    end
-
     def to_s
-      "(#{args.join(', ')}#{block ? ' &{|| ... }' : ''})"
+      p block
+      arg_str = args.map(&:inspect).join(', ')
+      sep = args.empty? && block ? '' : ', '
+      block_str = block ? "#{sep}&{ ... }" : ''
+      "#{arg_str}#{block_str}"
     end
   end
 
   class SomeValue
-    def pretty_print(pp)
-      pp.text '('
-      pp.pp value
-      pp.text ", '#{description}'" if description
-      pp.text ')'
-    end
-
     def to_s
-      description || value.to_s
+      description || value.inspect
     end
   end
 
-  class Message
+  class Message < SomeValue
     def to_s
-      value.to_s + (description ? " (#{description})" : '')
+      extra = description ? " (#{description})" : nil
+      "#{value}#{extra}"
     end
   end
 
   class Context
-    def pretty_print(pp)
-      pp.pp to_h
-    end
-
     def to_s
-      [message,
-       arguments,
+      [arguments && !message ? "with #{arguments}" : nil,
+       arguments && message ? "#{message}(#{arguments})" : message,
        message && subject ? 'on' : nil,
        subject].reject(&:nil?).join(' ')
     end
