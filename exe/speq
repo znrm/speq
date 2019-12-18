@@ -1,11 +1,7 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'speq'
 require 'speq/cli'
 
-files = Speq::CLI.find_files(ARGV)
-
-tests = files.map do |file|
-  Speq::Test.new(&-> { instance_eval(File.read(file), file) })
-end
-
-Speq::CLI.print_report(tests)
+Speq::CLI.run_and_report(ARGV)
