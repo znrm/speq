@@ -29,7 +29,7 @@ module Speq
     end
 
     def to_s
-      [newline, title, units.join('')].join('')
+      [newline, title, units.join(''), parent ? '' : newline + report].join('')
     end
   end
 
@@ -62,7 +62,6 @@ module Speq
 
   class Arguments
     def to_s
-      p block
       arg_str = args.map(&:inspect).join(', ')
       sep = args.empty? && block ? '' : ', '
       block_str = block ? "#{sep}&{ ... }" : ''

@@ -16,18 +16,14 @@ module Speq
     end
 
     def self.run_tests(paths)
-      collection = Test.new(DateTime.now)
-
-      paths.each do |file|
-        collection.speq(file_name_to_test_description(file)) do
-          instance_eval(File.read(file), file)
-        end
-      end
-
-      collection
+      paths.map { |file| file_test(file) }
     end
 
-    def self.file_name_to_test_description(path)
+    def self.file_test(file)
+      speq(file_description(file)) { instance_eval(File.read(file), file) }
+    end
+
+    def self.file_description(path)
       path
         .split('/').last
         .delete_suffix('_speq.rb')
@@ -43,7 +39,7 @@ module Speq
     end
 
     def self.print_report(tests)
-      puts tests, '', tests.report
+      puts tests
     end
   end
 end

@@ -127,8 +127,8 @@ module Speq
             return false unless object.send(key) == value
           end
         end,
-        "has all #{symbols.empty? ? nil : symbols}#{key_value_pairs}",
-        "doesn't have all #{symbols.empty? ? nil : symbols}#{key_value_pairs}"
+        "has #{symbols.empty? ? nil : symbols}#{key_value_pairs}",
+        "doesn't have #{symbols.empty? ? nil : symbols}#{key_value_pairs}"
       )
     end
 
