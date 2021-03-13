@@ -9,7 +9,7 @@ def speq(description, &block)
   Speq::Test.new(description, &block)
 end
 
-# Build specs with fewer words
+# Build simple tests with fewer words
 module Speq
   # Test code executes within the context of this class
   class TestBlock
@@ -82,10 +82,10 @@ module Speq
   class Test < Group
     attr_reader :description
 
-    def initialize(description, parent = nil)
+    def initialize(description, parent = nil, &block)
       super(parent)
       @description = description
-      run(&proc) if block_given?
+      run &block if block_given?
     end
 
     def run(&block)
@@ -118,15 +118,15 @@ module Speq
       parent << Test.new(description, self, &block)
     end
 
-    def on(val, description = nil)
+    def on(val, description = nil, &block)
       context.subject = Subject.new(val, description)
-      speq(&proc) if block_given?
+      speq &block if block_given?
       self
     end
 
-    def does(val, description = nil)
+    def does(val, description = nil, &block)
       context.message = Message.new(val, description)
-      speq(&proc) if block_given?
+      speq &block if block_given?
       self
     end
 

@@ -91,7 +91,7 @@ module Speq
     end
 
     def merge(context)
-      Context.new(to_h.merge(context.to_h))
+      Context.new(**to_h.merge(context.to_h))
     end
 
     def to_h
